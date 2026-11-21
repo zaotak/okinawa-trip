@@ -253,6 +253,45 @@ img{max-width:100%}
 .nlist li:first-child{border-top:0}
 .nlist li span{font-family:var(--f-num);user-select:all}
 .nlist li em{grid-column:1/3;font-style:normal;color:var(--muted);font-size:12.5px}
+.spend-top{display:grid;gap:14px;grid-template-columns:minmax(0,1fr)}
+@media (min-width:860px){.spend-top{grid-template-columns:minmax(0,4fr) minmax(0,7fr)}}
+.ssum{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px;display:grid;gap:10px;align-content:start}
+.ssum .row2{display:flex;justify-content:space-between;gap:8px;font-size:13.5px;color:var(--muted)}
+.ssum .row2 b{color:var(--ink);font-family:var(--f-num);font-weight:500}
+.sact{display:flex;flex-wrap:wrap;gap:8px}
+.sbtn{font:inherit;font-size:14px;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:99px;padding:9px 16px;cursor:pointer}
+.sbtn.pri{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.sbtn.del{color:var(--accent);border-color:color-mix(in srgb,var(--accent) 45%,transparent)}
+.sbtn:disabled{opacity:.5;cursor:default}
+.scats{list-style:none;margin:0;padding:0;background:var(--surface);border:1px solid var(--line);border-radius:var(--r)}
+.scats li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;padding:10px 16px;border-top:1px solid var(--line);font-size:14px}
+.scats li:first-child{border-top:0}
+.scats .am{font-family:var(--f-num);text-align:right;white-space:nowrap}
+.scats .bar{grid-column:1/3;height:6px;border-radius:99px;background:var(--paper);overflow:hidden}
+.scats .bar span{display:block;height:100%;background:var(--teal)}
+.scats .bar.over span{background:var(--warn)}
+.scats .pl{grid-column:1/3;font-size:12px;color:var(--muted)}
+.sform{background:var(--surface);border:1px solid var(--teal);border-radius:14px;padding:16px 18px;display:grid;gap:12px}
+.sform .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.sform label{display:grid;gap:4px;font-size:12.5px;color:var(--muted);font-weight:600}
+.sform input,.sform select{font:inherit;font-size:16px;font-weight:400;color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:8px 10px;width:100%;min-width:0}
+.sform .amt{display:flex;gap:6px}
+.sform .amt input{flex:1 1 auto}.sform .amt select{flex:0 0 68px;width:68px}
+.sform .aist{font-size:13.5px;color:var(--muted);display:flex;gap:10px;align-items:center}
+.sform .aist.err{color:var(--warn)}
+.sform .aist img{width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid var(--line)}
+.sform .fx{display:none}.sform.isfx .fx{display:grid}
+.slist{display:grid;gap:12px}
+.sday h3{font-family:var(--f-body);font-size:13.5px;color:var(--muted);font-weight:600;margin:0 0 6px;display:flex;justify-content:space-between}
+.sday ul{list-style:none;margin:0;padding:0;background:var(--surface);border:1px solid var(--line);border-radius:var(--r)}
+.sday li{border-top:1px solid var(--line)}.sday li:first-child{border-top:0}
+.sday button{all:unset;box-sizing:border-box;width:100%;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 12px;padding:10px 16px;cursor:pointer;font-size:14px}
+.sday button:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.sday .nm{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sday .am{font-family:var(--f-num);text-align:right;white-space:nowrap}
+.sday .mt{font-size:12.5px;color:var(--muted)}
+.sday .kw{font-size:12px;color:var(--muted);text-align:right;font-family:var(--f-num)}
+.sempty{font-size:14px;color:var(--muted);background:var(--surface);border:1px dashed var(--line);border-radius:var(--r);padding:14px 16px;margin:0}
 </style>
 </head>
 <body>
@@ -317,6 +356,30 @@ img{max-width:100%}
     </div>
     <ul class="blist" id="blist"></ul>
   </div>
+</section>
+
+<section class="block" id="spend">
+  <div class="shead"><h2>지출 기록</h2><p>가족이 같이 적는 여행 가계부예요. 영수증을 찍으면 AI가 가게·금액·항목을 채워 주고, 확인한 뒤 저장하면 모두의 휴대폰에 바로 보여요. <span class="sync" id="spsync"></span></p></div>
+  <div class="spend-top">
+    <div class="ssum" id="ssum"></div>
+    <ul class="scats" id="scats"></ul>
+  </div>
+  <div class="sact"><button class="sbtn pri" type="button" id="sphoto">영수증 찍기</button><button class="sbtn" type="button" id="smanual">직접 입력</button><input type="file" id="sfile" accept="image/*" hidden></div>
+  <form class="sform" id="sform" hidden>
+    <div class="aist" id="aist"></div>
+    <div class="grid">
+      <label>날짜<input type="date" name="d" required></label>
+      <label>가게·내용<input type="text" name="shop" required autocomplete="off" placeholder="예: 키시모토 식당"></label>
+      <label>금액<span class="amt"><input type="number" name="amt" inputmode="numeric" min="0" step="1" required><select name="cur" aria-label="통화"><option value="JPY">엔</option><option value="KRW">원</option></select></span></label>
+      <label>항목<select name="cat"></select></label>
+      <label>결제<select name="pay"><option>현금</option><option>카드</option><option>전자머니</option><option>계좌이체</option></select></label>
+      <label>누가<select name="who"><option>아빠</option><option>엄마</option><option>첫째</option><option>둘째</option></select></label>
+      <label class="fx">받은 엔화<input type="number" name="yen" inputmode="numeric" min="0" step="1"></label>
+      <label style="grid-column:1/-1">메모<input type="text" name="memo" autocomplete="off" placeholder="예: 소바 대 2, 쥬시 2"></label>
+    </div>
+    <div class="sact"><button class="sbtn pri" type="submit">저장</button><button class="sbtn" type="button" id="scancel">취소</button><button class="sbtn del" type="button" id="sdel" hidden>삭제</button></div>
+  </form>
+  <div class="slist" id="slist"></div>
 </section>
 
 <section class="block" id="food">
@@ -545,22 +608,28 @@ const SYNC={state:'local',db:null,ref:null,fns:null};
 function tripCode(){try{const u=new URL(location.href);const c=u.searchParams.get('trip');if(c){store.set('okn-trip',c);u.searchParams.delete('trip');history.replaceState(null,'',u.pathname+u.search+u.hash)}}catch(e){}return store.get('okn-trip')}
 function setSync(st){SYNC.state=st;const e=document.getElementById('syncst');if(!e)return;
   e.textContent={local:'이 휴대폰에만 저장돼요',connecting:'가족 공유 연결 중…',live:'가족과 실시간 공유 중',offline:'오프라인 · 연결되면 자동으로 맞춰져요',nocode:'가족 공유 링크로 한 번 열어 주세요'}[st]||'';e.className='sync '+st}
+const FBV='13.2.0';let FBAPP=null;
+function fbApp(){if(FBAPP)return FBAPP;FBAPP=(async()=>{const cfg=window.TRIP_CONFIG.firebase;
+  const appm=await import(`https://www.gstatic.com/firebasejs/${FBV}/firebase-app.js`);const app=appm.initializeApp(cfg);
+  const ac=window.TRIP_CONFIG.ai&&window.TRIP_CONFIG.ai.appCheck;
+  if(ac&&ac.siteKey){try{const m=await import(`https://www.gstatic.com/firebasejs/${FBV}/firebase-app-check.js`);
+    m.initializeAppCheck(app,{provider:ac.type==='enterprise'?new m.ReCaptchaEnterpriseProvider(ac.siteKey):new m.ReCaptchaV3Provider(ac.siteKey),isTokenAutoRefreshEnabled:true})}catch(e){console.warn('appcheck',e)}}
+  return app})();FBAPP.catch(()=>{FBAPP=null});return FBAPP}
 async function initSync(){
   const cfg=window.TRIP_CONFIG&&window.TRIP_CONFIG.firebase;const code=tripCode();
   if(!cfg){setSync('local');return}
   if(!code){setSync('nocode');return}
   setSync('connecting');
   try{
-    const V='10.12.2';
-    const appm=await import(`https://www.gstatic.com/firebasejs/${V}/firebase-app.js`);
-    const fs=await import(`https://www.gstatic.com/firebasejs/${V}/firebase-firestore.js`);
-    const app=appm.initializeApp(cfg);
+    const app=await fbApp();
+    const fs=await import(`https://www.gstatic.com/firebasejs/${FBV}/firebase-firestore.js`);
     let db;try{db=fs.initializeFirestore(app,{localCache:fs.persistentLocalCache({tabManager:fs.persistentMultipleTabManager()})})}catch(e){db=fs.getFirestore(app)}
     SYNC.db=db;SYNC.fns=fs;SYNC.ref=fs.doc(db,'trips',code);
     fs.onSnapshot(SYNC.ref,{includeMetadataChanges:true},snap=>{
       const data=snap.data()||{};if(data.checks){done=Object.assign({},done,data.checks);store.set('okn-check3',JSON.stringify(done))}
       if(data.notes&&typeof data.notes==='object'){NOTES=data.notes;renderNotes()}
-      setSync(snap.metadata.fromCache&&!navigator.onLine?'offline':'live');renderChecks();markTimeline()},
+      if(!snap.metadata.hasPendingWrites||data.exp){EXP=(data.exp&&typeof data.exp==='object')?data.exp:{};saveExpLocal()}
+      setSync(snap.metadata.fromCache&&!navigator.onLine?'offline':'live');renderChecks();markTimeline();renderSpend()},
       err=>{console.warn(err);setSync('local')});
   }catch(e){console.warn(e);setSync('local')}
 }
@@ -690,10 +759,10 @@ setInterval(renderGuide,60000);
 
 /* ---------- budget ---------- */
 const BUD=[
-  {k:'항공권 · 확정',won:[2692800,2692800],n:'트리니티항공 가는 편 970,800원 + 오는 편 1,722,000원'},
+  {k:'항공권 · 확정',won:[2700800,2700800],n:'트리니티항공 가는 편 950,800원 + 오는 편 1,702,000원 + 좌석 지정 24,000원×2'},
   {k:'오리온 호텔 모토부 2박 · 확정',won:[1263408,1263408],n:'카모아 결제 완료, 조식 포함'},
   {k:'식비',yen:[112000,144000],n:'점심·저녁 1인 하루 7,000~9,000엔 × 4명 × 4일, 조식은 두 호텔 모두 포함'},
-  {k:'세나가지마 호텔 2박 · 확정',yen:[89083,89083],n:'아고다 후불 89,083엔, 결제일 환율로 청구, 조식 포함'},
+  {k:'세나가지마 호텔 2박 · 확정',won:[718263,718263],n:'아고다 89,083엔, 원화 718,263원 결제, 조식 포함'},
   {k:'쇼핑·기념품',yen:[50000,100000],n:'아웃렛·국제거리 예비비',shop:true},
   {k:'렌터카 · 확정',won:[243600,243600],n:'원즈 렌터카 4일, 풀커버 보험(자기부담금 0엔) 포함'},
   {k:'입장료',yen:[15000,15000],n:'츄라우미 성인 2,180엔×4, 슈리성, 나키진 성터 400엔×4 (스파는 하지 않음)'},
@@ -714,8 +783,131 @@ function calcBudget(){
   const op=v=>Math.max(.28,1-sorted.indexOf(v)*.1);
   document.getElementById('bstack').innerHTML=vals.filter(x=>x.on).map(x=>`<span style="width:${(x.v/total*100).toFixed(2)}%;opacity:${op(x)}" title="${x.b.k}"></span>`).join('');
   document.getElementById('blist').innerHTML=vals.map(x=>`<li class="${x.on?'':'off'}"><span class="sw" style="opacity:${op(x)}"></span><span class="nm">${x.b.k}</span><span class="am">${man(x.v)}만 원${x.yen!=null?`<br><span style="color:var(--muted);font-size:12px">${Math.round(x.yen/1000).toLocaleString('ko-KR')}천 엔</span>`:''}</span><span class="nt">${x.b.n}</span></li>`).join('');
-  store.set('okn-budget',JSON.stringify({l:bl.value,r:br.value,s:bs.checked}))}
+  store.set('okn-budget',JSON.stringify({l:bl.value,r:br.value,s:bs.checked}));if(SYNC.spendReady)renderSpend()}
 [bl,br,bs].forEach(e=>e.addEventListener('input',calcBudget));calcBudget();
+
+/* ---------- spend log (shared) ---------- */
+const CATS=['식비','카페·간식','쇼핑','입장료','주유·교통','숙박','항공','렌터카','보험','환전','기타'];
+const LOCALCAT=[['식비·카페',['식비','카페·간식'],'식비'],['쇼핑',['쇼핑'],'쇼핑·기념품'],['입장료',['입장료'],'입장료'],['주유·교통',['주유·교통'],'주유·고속도로·주차'],['숙박(현장)',['숙박'],null],['기타',['기타','항공','렌터카','보험'],null]];
+let EXP={};try{EXP=JSON.parse(store.get('okn-exp')||'{}')||{}}catch(e){EXP={}}
+const sf=document.getElementById('sform');sf.cat.innerHTML=CATS.map(c=>`<option>${c}</option>`).join('');
+let editing=null;
+function saveExpLocal(){store.set('okn-exp',JSON.stringify(EXP))}
+function yenRate(){let k=0,y=0;Object.values(EXP).forEach(e=>{if(e&&e.cat==='환전'&&e.yen>0){k+=+e.amt||0;y+=+e.yen}});return y?{r:k/y,real:true}:{r:(Number(br.value)||900)/100,real:false}}
+function won(n){return Math.round(n).toLocaleString('ko-KR')+'원'}
+function yen(n){return Math.round(n).toLocaleString('ko-KR')+'엔'}
+function curBudYen(name){const b=BUD.find(x=>x.k===name);if(!b||!b.yen)return null;const t=bl.value/100;return b.yen[0]+(b.yen[1]-b.yen[0])*t}
+function renderSpend(){
+  const list=Object.entries(EXP).filter(([k,e])=>e&&typeof e==='object').map(([id,e])=>Object.assign({id},e));
+  const R=yenRate();let pre=0,fxK=0,fxY=0,jp=0,cash=0,card=0;const bycat={};
+  list.forEach(e=>{const a=+e.amt||0;if(e.cat==='환전'){fxK+=a;fxY+=+e.yen||0;return}
+    if(e.cur==='KRW'){if(e.d<TRIP[0])pre+=a;else{bycat[e.cat]=(bycat[e.cat]||0)+a/R.r}return}
+    jp+=a;bycat[e.cat]=(bycat[e.cat]||0)+a;if(e.pay==='현금')cash+=a;else card+=a});
+  const localKRWasYen=list.filter(e=>e.cur==='KRW'&&e.cat!=='환전'&&e.d>=TRIP[0]).reduce((s,e)=>s+(+e.amt||0),0);
+  const total=pre+jp*R.r+localKRWasYen;
+  document.getElementById('ssum').innerHTML=`<div><div class="eyebrow">지금까지 여행 경비</div><div class="big"><span class="num">${man(total)}</span><small>만 원</small></div><div style="font-size:13px;color:var(--muted)">환전한 돈은 실제로 쓴 만큼만 셉니다</div></div>
+  <div class="row2"><span>출발 전 결제 (항공·숙박·렌터카·보험)</span><b>${won(pre)}</b></div>
+  <div class="row2"><span>현지 지출</span><b>${yen(jp)}${jp?` · 약 ${won(jp*R.r)}`:''}</b></div>
+  ${fxK?`<div class="row2"><span>환전</span><b>${won(fxK)}${fxY?` → ${yen(fxY)}`:''}</b></div>`:''}
+  ${fxY?`<div class="row2"><span>현금 남은 돈 (환전액 − 현금 지출)</span><b>${yen(fxY-cash)}</b></div>`:''}
+  <div class="row2"><span>${R.real?'실제 환전 환율':'계산 환율 (예산 칸)'}</span><b>100엔 = ${Math.round(R.r*100).toLocaleString('ko-KR')}원</b></div>
+  ${fxK&&!fxY?'<div class="row2" style="color:var(--warn)">환전 기록에 받은 엔화를 넣으면 현금 잔액과 실제 환율이 계산돼요.</div>':''}`;
+  document.getElementById('scats').innerHTML=LOCALCAT.map(([nm,cs,bud])=>{const v=cs.reduce((s,c)=>s+(bycat[c]||0),0);const plan=bud?curBudYen(bud):null;
+    if(!v&&!plan)return '';const pct=plan?Math.min(100,v/plan*100):0;
+    return `<li><span>${nm}</span><span class="am">${yen(v)}</span>${plan?`<span class="bar${v>plan?' over':''}"><span style="width:${pct.toFixed(1)}%"></span></span><span class="pl">계획 ${yen(plan)} 중 ${Math.round(v/plan*100)}%${v>plan?' · 계획 초과':''}</span>`:''}</li>`}).join('');
+  const groups={};list.forEach(e=>{const g=e.d<TRIP[0]?'pre':e.d;(groups[g]=groups[g]||[]).push(e)});
+  const keys=Object.keys(groups).sort((a,b)=>a==='pre'?-1:b==='pre'?1:a<b?-1:1);
+  const label=g=>{if(g==='pre')return '출발 전';const i=TRIP.indexOf(g);return i>=0?`Day ${i+1} · ${g.slice(5).replace('-','/')} ${DAYS[i].w}요일`:g.slice(5).replace('-','/')};
+  document.getElementById('slist').innerHTML=keys.length?keys.map(g=>{const rows=groups[g].sort((a,b)=>(a.d+(a.tm||'')+(a.c||0))<(b.d+(b.tm||'')+(b.c||0))?-1:1);
+    const sum=rows.filter(e=>e.cat!=='환전').reduce((s,e)=>s+(e.cur==='KRW'?+e.amt:+e.amt*R.r),0);
+    return `<div class="sday"><h3><span>${label(g)}</span><span class="num">${won(sum)}</span></h3><ul>${rows.map(e=>`<li><button type="button" data-id="${esc(e.id)}"><span class="nm">${esc(e.shop||e.cat)}</span><span class="am">${e.cur==='KRW'?won(+e.amt):yen(+e.amt)}</span><span class="mt">${g==='pre'?esc(e.d.slice(5).replace('-','/'))+' · ':''}${esc(e.cat)} · ${esc(e.pay||'')} · ${esc(e.who||'')}${e.memo?' · '+esc(e.memo):''}</span><span class="kw">${e.cur==='KRW'?(e.cat==='환전'&&e.yen?yen(+e.yen):''):'≈ '+won(+e.amt*R.r)}</span></button></li>`).join('')}</ul></div>`}).join(''):'<p class="sempty">아직 기록이 없어요. 여행 중에 영수증을 찍거나 직접 입력해 보세요.</p>';
+  document.querySelectorAll('#slist [data-id]').forEach(b=>b.addEventListener('click',()=>openForm(EXP[b.dataset.id],b.dataset.id)));
+  const ss=document.getElementById('spsync');if(ss){ss.textContent=SYNC.ref?(SYNC.state==='offline'?'· 오프라인 · 연결되면 자동으로 맞춰져요':'· 가족과 공유 중'):'· 이 휴대폰에만 저장돼요';ss.className='sync '+(SYNC.ref?SYNC.state:'local')}
+}
+function todayJ(){const n=jstNow().ymd;return n}
+function aiSt(html,err){const a=document.getElementById('aist');a.innerHTML=html||'';a.className='aist'+(err?' err':'');a.hidden=!html}
+function openForm(e,id){editing=id||null;sf.hidden=false;sf.reset();aiSt('');
+  const me=store.get('okn-me')||'아빠';
+  sf.d.value=(e&&e.d)||todayJ();sf.shop.value=(e&&e.shop)||'';sf.amt.value=(e&&e.amt)||'';sf.cur.value=(e&&e.cur)||'JPY';sf.cat.value=(e&&e.cat)||'식비';sf.pay.value=(e&&e.pay)||'현금';sf.who.value=(e&&e.who)||me;sf.memo.value=(e&&e.memo)||'';sf.yen.value=(e&&e.yen)||'';
+  sf.classList.toggle('isfx',sf.cat.value==='환전');document.getElementById('sdel').hidden=!id;
+  sf.scrollIntoView({behavior:reduce?'auto':'smooth',block:'center'})}
+sf.cat.addEventListener('change',()=>{sf.classList.toggle('isfx',sf.cat.value==='환전');if(sf.cat.value==='환전')sf.cur.value='KRW'});
+function closeForm(){sf.hidden=true;editing=null;aiSt('')}
+function pushExp(id,val){if(!SYNC.ref)return;SYNC.fns.setDoc(SYNC.ref,{exp:{[id]:val===null?SYNC.fns.deleteField():val}},{merge:true}).catch(e=>console.warn(e))}
+sf.addEventListener('submit',ev=>{ev.preventDefault();
+  const amt=Math.round(Number(sf.amt.value));if(!(amt>0)){sf.amt.focus();return}
+  const id=editing||('e'+Date.now().toString(36)+Math.random().toString(36).slice(2,6));const old=EXP[id]||{};
+  const v={d:sf.d.value,shop:sf.shop.value.trim(),amt,cur:sf.cur.value,cat:sf.cat.value,pay:sf.pay.value,who:sf.who.value,memo:sf.memo.value.trim(),c:old.c||Date.now()};
+  if(old.tm)v.tm=old.tm;if(sf._tm){v.tm=sf._tm;sf._tm=null}
+  if(v.cat==='환전'&&Number(sf.yen.value)>0)v.yen=Math.round(Number(sf.yen.value));
+  if(old.ai)v.ai=old.ai;if(sf._ai){v.ai=true;sf._ai=false}
+  store.set('okn-me',v.who);EXP[id]=v;saveExpLocal();pushExp(id,v);closeForm();renderSpend();
+  const b=document.querySelector(`#slist [data-id="${id}"]`);if(b)b.focus()});
+document.getElementById('scancel').addEventListener('click',closeForm);
+document.getElementById('sdel').addEventListener('click',()=>{if(!editing)return;const id=editing;delete EXP[id];saveExpLocal();pushExp(id,null);closeForm();renderSpend()});
+document.getElementById('smanual').addEventListener('click',()=>openForm(null));
+
+/* receipt → AI */
+const sfile=document.getElementById('sfile');
+document.getElementById('sphoto').addEventListener('click',()=>{sfile.value='';sfile.click()});
+sfile.addEventListener('change',async()=>{const f=sfile.files&&sfile.files[0];if(!f)return;
+  openForm(null);let data;
+  try{data=await shrink(f)}catch(e){aiSt('사진을 열지 못했어요. 직접 입력해 주세요.',true);return}
+  const thumb=`<img src="${data}" alt="찍은 영수증">`;
+  if(!navigator.onLine){aiSt(thumb+'<span>인터넷이 연결되지 않아 AI가 읽을 수 없어요. 직접 입력해 주세요.</span>',true);return}
+  aiSt(thumb+'<span>AI가 영수증을 읽는 중… (5~15초)</span>');
+  const btns=sf.querySelectorAll('button');btns.forEach(b=>b.disabled=true);
+  try{const r=await readReceipt(data.split(',')[1]);
+    if(sf.hidden)return;
+    if(r.receipt===false){aiSt(thumb+'<span>영수증으로 보이지 않아요. 다시 찍거나 직접 입력해 주세요.</span>',true);return}
+    if(r.shop)sf.shop.value=r.shopKo&&r.shopKo!==r.shop?`${r.shopKo} (${r.shop})`:r.shop;
+    if(r.total>0){sf.amt.value=r.total;sf.cur.value='JPY'}
+    if(/^\d{4}-\d{2}-\d{2}$/.test(r.date||''))sf.d.value=r.date;
+    if(/^\d{1,2}:\d{2}$/.test(r.time||''))sf._tm=r.time.padStart(5,'0');
+    if(CATS.includes(r.cat))sf.cat.value=r.cat;
+    if(['현금','카드','전자머니'].includes(r.pay))sf.pay.value=r.pay;
+    if(r.items)sf.memo.value=r.items;
+    sf._ai=true;sf.classList.toggle('isfx',sf.cat.value==='환전');
+    aiSt(thumb+'<span>AI가 채웠어요. 금액과 날짜가 맞는지 확인하고 저장해 주세요.</span>');
+  }catch(e){console.warn(e);aiSt(thumb+`<span>${esc(aiErr(e))} 직접 입력해 주세요.</span>`,true)}
+  finally{btns.forEach(b=>b.disabled=false)}});
+async function shrink(file){
+  const url=URL.createObjectURL(file);
+  try{const img=await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=url});
+    const s=Math.min(1,1600/Math.max(img.naturalWidth,img.naturalHeight));const c=document.createElement('canvas');
+    c.width=Math.round(img.naturalWidth*s);c.height=Math.round(img.naturalHeight*s);c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+    return c.toDataURL('image/jpeg',.82)}finally{URL.revokeObjectURL(url)}}
+function aiErr(e){const m=String(e&&(e.message||e.code)||e);
+  if(/no-config|설정/.test(m))return 'AI 설정이 아직 없어요.';
+  if(/app-check|AppCheck|appCheck/i.test(m))return 'App Check 확인에 실패했어요.';
+  if(/API has not been used|disabled|SERVICE_DISABLED|firebasevertexai|PERMISSION_DENIED|403/i.test(m))return 'Firebase 콘솔에서 AI Logic이 아직 켜지지 않았어요.';
+  if(/quota|429|RESOURCE_EXHAUSTED/i.test(m))return '오늘 무료 사용량을 다 썼어요.';
+  return 'AI가 읽지 못했어요.'}
+const AIQ={model:null,tried:0};
+async function readReceipt(b64){
+  const cfg=window.TRIP_CONFIG||{};if(!cfg.firebase)throw new Error('no-config');
+  const app=await fbApp();const ai=await import(`https://www.gstatic.com/firebasejs/${FBV}/firebase-ai.js`);
+  const S=ai.Schema;
+  const schema=S.object({properties:{receipt:S.boolean(),shop:S.string(),shopKo:S.string(),total:S.integer(),date:S.string(),time:S.string(),pay:S.string(),cat:S.string(),items:S.string()},optionalProperties:['shop','shopKo','total','date','time','pay','cat','items']});
+  const prompt=`이 사진은 일본 오키나와 가족여행(2026년 12월 23~27일) 중 받은 영수증이다. JSON으로만 답하라.
+receipt: 영수증·계산서·티켓이면 true, 아니면 false
+shop: 영수증에 적힌 가게 이름 그대로
+shopKo: 가게 이름의 한국어 표기(가타카나·한자는 한국어로 읽어 적기, 영어 이름은 그대로)
+total: 세금 포함 최종 결제 금액(엔, 정수). 合計·お支払·税込 합계를 쓰고 お預り(받은 돈)·お釣り(거스름돈)는 쓰지 마라
+date: 결제 날짜 YYYY-MM-DD (일본 연호 令和8年=2026년), 없으면 빈 문자열
+time: 결제 시각 HH:MM, 없으면 빈 문자열
+pay: 現金이면 "현금", クレジット·カード면 "카드", 電子マネー·Suica·PayPay·QR이면 "전자머니", 모르면 빈 문자열
+cat: 다음 중 하나 — 식비, 카페·간식, 쇼핑, 입장료, 주유·교통, 숙박, 기타 (편의점 음식은 카페·간식, 기념품·의류·약국은 쇼핑, 주유소·고속도로·주차는 주유·교통)
+items: 주요 품목을 한국어로 짧게, 40자 이내 (예: "소바 대 2, 쥬시 2")`;
+  const names=[].concat((cfg.ai&&cfg.ai.models)||['gemini-3.5-flash','gemini-2.5-flash']);let last;
+  for(let i=AIQ.tried;i<names.length;i++){
+    try{const inst=ai.getAI(app,{backend:new ai.GoogleAIBackend()});
+      const m=ai.getGenerativeModel(inst,{model:names[i],generationConfig:{responseMimeType:'application/json',responseSchema:schema,temperature:0}});
+      const res=await m.generateContent([prompt,{inlineData:{data:b64,mimeType:'image/jpeg'}}]);
+      AIQ.tried=i;return JSON.parse(res.response.text())}
+    catch(e){last=e;if(!/not found|404|not supported|NOT_FOUND/i.test(String(e&&e.message)))throw e}}
+  throw last}
+SYNC.spendReady=true;renderSpend();
 
 /* ---------- food ---------- */
 const M1='https://rurubu.jp/andmore/article/17893',RT='https://retty.me/theme/200248970/',MS='https://www.mapple.net/region/a0705010200_g03000000_s-situation=family/spot/',MSH='https://www.mapple.net/region/a0705010102_g03050b00_s-situation=couple/spot/',MC='https://www.mapple.net/region/a0705010301_g03000000_s-situation=female/spot/',RC='https://retty.me/theme/100469606/',MM='https://www.mapple.net/region/a0705010700_g03040000_s-situation=couple/spot/',RK='https://retty.me/theme/200246931/',HM='https://hamoni.jp/area/okinawa/kunigami/motobu/list/washoku-japanese-cuisine';

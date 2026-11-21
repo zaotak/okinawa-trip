@@ -10,5 +10,11 @@ window.TRIP_CONFIG = {
     storageBucket: "okinawa-trip-a5628.firebasestorage.app",
     messagingSenderId: "951321174823",
     appId: "1:951321174823:web:77ea59c6ff0fb014ec7f02"
+  },
+  /* 영수증 AI 판별 (Firebase AI Logic · Gemini Developer API, 무료 요금제)
+     models: 앞에서부터 시도합니다. appCheck.siteKey: reCAPTCHA 사이트 키(공개돼도 되는 값)를 넣으면 남이 AI를 쓰지 못하게 막습니다. */
+  ai: {
+    models: ["gemini-3.5-flash", "gemini-2.5-flash"],
+    appCheck: { type: "v3", siteKey: "" }
   }
 };
