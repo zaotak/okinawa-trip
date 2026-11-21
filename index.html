@@ -879,7 +879,7 @@ async function shrink(file){
     return c.toDataURL('image/jpeg',.82)}finally{URL.revokeObjectURL(url)}}
 function aiErr(e){const m=String(e&&(e.message||e.code)||e);
   if(/no-config|설정/.test(m))return 'AI 설정이 아직 없어요.';
-  if(/app-check|AppCheck|appCheck/i.test(m))return 'App Check 확인에 실패했어요.';
+  if(/app.?check/i.test(m))return '보안 확인(App Check)에 실패했어요.';
   if(/API has not been used|disabled|SERVICE_DISABLED|firebasevertexai|PERMISSION_DENIED|403/i.test(m))return 'Firebase 콘솔에서 AI Logic이 아직 켜지지 않았어요.';
   if(/quota|429|RESOURCE_EXHAUSTED/i.test(m))return '오늘 무료 사용량을 다 썼어요.';
   return 'AI가 읽지 못했어요.'}
