@@ -15,6 +15,6 @@ window.TRIP_CONFIG = {
      models: 앞에서부터 시도합니다. appCheck.siteKey: reCAPTCHA 사이트 키(공개돼도 되는 값)를 넣으면 남이 AI를 쓰지 못하게 막습니다. */
   ai: {
     models: ["gemini-3.5-flash", "gemini-2.5-flash"],
-    appCheck: { type: "v3", siteKey: "" }
+    appCheck: { type: "v3", siteKey: "6LeMWCsuAAAAAN7QAZGcYTIneFLbD_XDHpxBeiuh" }
   }
 };
